@@ -3,6 +3,15 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 echo "Starting user_data setup for CPU LightGBM benchmark node"
 
+# Set up 2GB swap space for t3.micro (1GB RAM) to avoid OOM
+if [ ! -f /swapfile ]; then
+    fallocate -l 2G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+
 apt-get update -y
 apt-get install -y python3 python3-pip
 
